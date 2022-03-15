@@ -16,10 +16,8 @@ def print_full_dataframe(df, head):
             print(df)
 
 
-def run_script():
+def get_html_for_ticker(ticker):
     url = 'https://finviz.com/quote.ashx?t='
-    ticker = 'TSLA'
-    news_tables = {}
 
     # Get data for all tickers
     url = url + ticker
@@ -29,17 +27,14 @@ def run_script():
     response = requests.get(url, headers={
         'User-Agent': user_agent})
     html = BeautifulSoup(response.content, "html.parser")
+    return html
 
+
+def parse_data(ticker, html):
     # Parse response
+    news_tables = {}
     news_table = html.find(id='news-table')
     news_tables[ticker] = news_table  # Get each row of news data
-    print("adding: ", news_tables)
-    # break  # only scrape 1 ticker
-
-    # Test output for TSLA
-    # tsla_data = news_tables['TSLA']
-    # tsla_rows = tsla_data.findAll('tr')
-    # print(tsla_rows)
 
     # Parse data further
     parsed_data = []
@@ -61,6 +56,10 @@ def run_script():
 
             parsed_data.append([ticker, date, time, title])
 
+    return parsed_data
+
+
+def make_dataframe(parsed_data):
     # Get sentiment analysis
     df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title'])
     sentiment = SentimentIntensityAnalyzer()
@@ -70,18 +69,33 @@ def run_script():
     # Modify date column
     df['date'] = pd.to_datetime(df.date).dt.date  # String -> Date format
 
+    return df
+
+
+def get_mean_compound_scores(df):
     # Get mean compound scores
     mean_df = df.groupby(["ticker", 'date']).mean()
-    print_full_dataframe(mean_df, True)
+    # rint_full_dataframe(mean_df, True)
+    return mean_df
 
+
+def chart_mean_compound_scores(mean_df):
     # Chart average compound scores with matplotlib
     mean_df = mean_df.unstack()
     mean_df = mean_df.xs('compound', axis="columns").transpose()
     mean_df.plot(kind='bar')
     plt.show()
 
+
+def get_mean_data(ticker):
+    html = get_html_for_ticker(ticker)
+    parsed_data = parse_data(ticker, html)
+    df = make_dataframe(parsed_data)
+    mean_df = get_mean_compound_scores(df)
+    chart_mean_compound_scores(mean_df)
+
     # print_full_dataframe(df, False)
 
 
 if __name__ == '__main__':
-    run_script()
+    get_mean_data('AAPL')
