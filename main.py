@@ -7,6 +7,60 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import matplotlib.pyplot as plt
 import time as t
 
+from flask import Flask, request
+from flask_cors import CORS
+import json, time
+from datetime import datetime
+
+app = Flask(__name__)
+CORS(app)
+
+
+# Default GET
+@app.route('/', methods=['GET'])
+def default():
+    current_time = datetime.now()
+    hour_min_sec = "%s:%s.%s" % (current_time.hour, current_time.minute, str(current_time.second)[:2])
+
+    data_set = {'type': 'none', 'content': 'Loaded the Finviz News Sentiment Analysis API', 'time_called': hour_min_sec}
+    json_dump = json.dumps(data_set)
+
+    return json_dump
+
+
+@app.route('/news/', methods=['GET'])
+def news():
+    current_time = datetime.now()
+    hour_min_sec = "%s:%s.%s" % (current_time.hour, current_time.minute, str(current_time.second)[:2])
+
+    user_ticker = request.args.get('ticker', None)
+    html = get_html_for_ticker(user_ticker)
+    parsed_data = parse_data(user_ticker, html)
+    df = make_dataframe_from_last_100_news_posts(parsed_data)
+
+    data_set = {'ticker': user_ticker, 'content': parsed_data, 'time_called': hour_min_sec}
+    json_dump = json.dumps(data_set)
+
+    return json_dump
+
+
+@app.route('/sentiment/', methods=['GET'])
+def get_average_compound():
+    current_time = datetime.now()
+    hour_min_sec = "%s:%s.%s" % (current_time.hour, current_time.minute, str(current_time.second)[:2])
+
+    user_ticker = request.args.get('ticker', None)
+    html = get_html_for_ticker(user_ticker)
+    parsed_data = parse_data(user_ticker, html)
+    df = make_dataframe_from_last_100_news_posts(parsed_data)
+    mean_df = get_mean_compound_scores(df)
+
+    data_set = {'ticker': user_ticker, 'content': mean_df.to_json(), 'time_called': hour_min_sec}
+    json_dump = json.dumps(data_set)
+
+    return json_dump
+
+
 
 def print_full_dataframe(df, head):
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
@@ -59,7 +113,7 @@ def parse_data(ticker, html):
     return parsed_data
 
 
-def make_dataframe(parsed_data):
+def make_dataframe_from_last_100_news_posts(parsed_data):
     # Get sentiment analysis
     df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title'])
     sentiment = SentimentIntensityAnalyzer()
@@ -90,12 +144,16 @@ def chart_mean_compound_scores(mean_df):
 def get_mean_data(ticker):
     html = get_html_for_ticker(ticker)
     parsed_data = parse_data(ticker, html)
-    df = make_dataframe(parsed_data)
+    df = make_dataframe_from_last_100_news_posts(parsed_data)
+    print_full_dataframe(df, False)
+
     mean_df = get_mean_compound_scores(df)
+    print_full_dataframe(mean_df, False)
     chart_mean_compound_scores(mean_df)
 
     # print_full_dataframe(df, False)
 
 
 if __name__ == '__main__':
-    get_mean_data('AAPL')
+    data = get_mean_data('GME')
+    # app.run(host='0.0.0.0', port=8910)
