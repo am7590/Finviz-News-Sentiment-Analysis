@@ -1,6 +1,7 @@
 from main import *
 from scraper import *
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from scraper import scrape_html_for_ticker, parse_data
 
 
 def make_dataframe_from_last_100_news_posts(parsed_data):

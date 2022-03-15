@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
-
-from api import *
+from app import *
 from service import *
 
 
@@ -35,7 +34,5 @@ def get_final_data(ticker):
 
 
 if __name__ == '__main__':
-    # get_final_data('GME')
-    # get_news_data("TLSA")
-    # parse_data("TSLA", scrape_html_for_ticker("TSLA"))
-    get_sentiment_data("TSLA")
+    get_final_data('GME')
+
