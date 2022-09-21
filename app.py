@@ -1,9 +1,10 @@
 from flask import Flask, request
+import requests
 import json, time
 from datetime import datetime
+import nltk
+from keys import token
 from main import *
-from service import *
-
 
 app = Flask(__name__)
 
@@ -11,10 +12,7 @@ app = Flask(__name__)
 # Default GET
 @app.route('/', methods=['GET'])
 def default():
-    current_time = datetime.now()
-    hour_min_sec = "%s:%s.%s" % (current_time.hour, current_time.minute, str(current_time.second)[:2])
-
-    data_set = {'type': 'none', 'content': 'Loaded the Finviz News Sentiment Analysis API', 'time_called': hour_min_sec}
+    data_set = {'type': 'none', 'content': 'Loaded the Finviz News Sentiment Analysis API'}
     json_dump = json.dumps(data_set)
 
     return json_dump
@@ -22,31 +20,18 @@ def default():
 
 @app.route('/news/', methods=['GET'])
 def news():
-    current_time = datetime.now()
-    hour_min_sec = "%s:%s.%s" % (current_time.hour, current_time.minute, str(current_time.second)[:2])
-
-    user_ticker = request.args.get('ticker', None)
-    parsed_data = get_news_data(user_ticker.strip())
-
-    data_set = {'ticker': user_ticker, 'content': parsed_data, 'time_called': hour_min_sec}
-    json_dump = json.dumps(data_set)
-
-    return json_dump
+    ticker = request.args.get('ticker', None)
+    url = f'https://cloud.iexapis.com/stable/stock/{ticker}/news/last/100/?token={token}'
+    return json.dumps(requests.get(url).json())
 
 
 @app.route('/sentiment/', methods=['GET'])
 def get_average_compound():
-    current_time = datetime.now()
-    hour_min_sec = "%s:%s.%s" % (current_time.hour, current_time.minute, str(current_time.second)[:2])
-
-    user_ticker = request.args.get('ticker', None)
-    mean_df = get_sentiment_data(user_ticker)
-
-    data_set = {'ticker': user_ticker, 'content': mean_df, 'time_called': hour_min_sec}
-    json_dump = json.dumps(data_set)
-
-    return json_dump
+    ticker = request.args.get('ticker', None)
+    # print(get_final_data(ticker))
+    data_set = {'content': get_final_data(ticker)[0], 'type': get_final_data(ticker)[1]}
+    return json.dumps(data_set)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=4200)
