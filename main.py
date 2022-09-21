@@ -28,12 +28,15 @@ def chart_mean_compound_scores(mean_df):
 def get_date(s):
     return datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')
 
+
 def consecutive_groups(iterable, ordering=lambda x: x):
     for k, g in groupby(enumerate(iterable), key=lambda x: x[0] - ordering(x[1])):
         yield map(itemgetter(1), g)
 
+
 def flatten(l):
     return [item for sublist in l for item in sublist]
+
 
 def get_final_data(ticker):
     url = f'https://cloud.iexapis.com/stable/stock/{ticker}/news/last/100/?token={token}'
@@ -106,7 +109,7 @@ def get_final_data(ticker):
 
     sentiment_score_list = []
     for item in find_sentiment_list:
-        sentiment_score_list.append(sentiment.polarity_scores(item['headline'])['compound'])
+        sentiment_score_list.append(sentiment.polarity_scores(item['summary'])['compound'])
 
     print(sentiment_score_list)
     # print([len(x) for x in sentiment_score_list])
