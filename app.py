@@ -28,8 +28,26 @@ def news():
 @app.route('/sentiment/', methods=['GET'])
 def get_average_compound():
     ticker = request.args.get('ticker', None)
-    # print(get_final_data(ticker))
+    print(get_final_data(ticker)[0])
+    print(get_final_data(ticker)[1])
     data_set = {'content': get_final_data(ticker)[0], 'type': get_final_data(ticker)[1]}
+    return json.dumps(data_set)
+
+
+@app.route('/welcome/', methods=['GET'])
+def get_welcome_page_data():
+    date = request.args.get('date', None)
+    calendar = welcome_status(date)[1]
+    print(calendar.date)
+
+    data_set = {'status': welcome_status(date)[0],
+                'open-date': calendar.date.strftime("%m/%d/%Y"),
+                'open-time': calendar.open.strftime("%H:%M:%S"),
+                'open-close': calendar.close.strftime("%H:%M:%S")
+                }
+
+    print(data_set)
+    print(json.dumps(data_set))
     return json.dumps(data_set)
 
 
