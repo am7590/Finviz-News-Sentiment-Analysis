@@ -15,6 +15,8 @@ token = os.getenv('TOKEN')
 API_KEY = os.getenv('API_KEY')
 API_SECRET = os.getenv('API_SECRET')
 
+nltk.download('vader_lexicon')
+
 def chart_mean_compound_scores(mean_df):
     # Chart average compound scores with matplotlib
     mean_df = mean_df.unstack()
