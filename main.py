@@ -2,7 +2,6 @@ import os
 
 from matplotlib import pyplot as plt
 from app import *
-from keys import *
 import requests
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from datetime import datetime, timedelta
