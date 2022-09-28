@@ -3,12 +3,13 @@ from app import *
 from keys import *
 import requests
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-import datetime
-from itertools import groupby
-from operator import itemgetter
+from datetime import datetime, timedelta
 from collections import Counter
 import alpaca_trade_api as tradeapi
 from alpaca_trade_api.common import (URL)
+import json
+import pprint
+
 
 def chart_mean_compound_scores(mean_df):
     # Chart average compound scores with matplotlib
@@ -19,12 +20,7 @@ def chart_mean_compound_scores(mean_df):
 
 
 def get_date(s):
-    return datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')
-
-
-def consecutive_groups(iterable, ordering=lambda x: x):
-    for k, g in groupby(enumerate(iterable), key=lambda x: x[0] - ordering(x[1])):
-        yield map(itemgetter(1), g)
+    return datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')
 
 
 def flatten(l):
@@ -116,6 +112,7 @@ def get_final_data(ticker):
         final_score_list = day_lists
         type = "days"
 
+
     return dict(zip(flatten(final_score_list), sentiment_score_list)), type
 
 
@@ -132,5 +129,4 @@ def welcome_status(date):
 
 
 if __name__ == '__main__':
-    get_final_data('TSLA')
-
+    print("main")
