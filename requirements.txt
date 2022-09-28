@@ -2,3 +2,4 @@ requests~=2.25.1
 nltk~=3.7
 Flask~=1.1.4
 matplotlib~=3.5.1
+MarkupSafe==2.0.1
