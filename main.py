@@ -1,3 +1,5 @@
+import os
+
 from matplotlib import pyplot as plt
 from app import *
 from keys import *
@@ -10,6 +12,9 @@ from alpaca_trade_api.common import (URL)
 import json
 import pprint
 
+token = os.getenv('TOKEN')
+API_KEY = os.getenv('API_KEY')
+API_SECRET = os.getenv('API_SECRET')
 
 def chart_mean_compound_scores(mean_df):
     # Chart average compound scores with matplotlib
