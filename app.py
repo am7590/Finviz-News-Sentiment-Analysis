@@ -3,7 +3,6 @@ import requests
 import json, time
 from datetime import datetime
 import nltk
-from keys import token
 from main import *
 
 app = Flask(__name__)
